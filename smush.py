@@ -29,7 +29,7 @@ def sendText():
    message = re.sub('[ ]', '+', args.message)
    # Text Message is limited to 160 characters (at this time)
    message = (message[:157] + '...') if len(message) > 160 else message
-   url = 'http://'+args.host+'/messagelist/send?number='+args.number+'&message='+message+'&username='+username+'&password='+password   
+   url = protocol+'://'+args.host+'/messagelist/send?number='+args.number+'&message='+message+'&username='+username+'&password='+password   
    result = smushBox(url)
    if result['success']:
       print result['message']
@@ -38,7 +38,7 @@ def sendText():
    sys.exit()
 
 def listIncoming():   
-   url = 'http://'+args.host+'/messagelist/list/incoming/al?&username='+username+'&password='+password
+   url = protocol+'://'+args.host+'/messagelist/list/incoming/al?&username='+username+'&password='+password
    result = smushBox(url)
    if result['success']:
       print "#\tPhone Number\tDate\t\t\tRead\tMessage"
@@ -49,7 +49,7 @@ def listIncoming():
    sys.exit()
 
 def listOutgoing():
-   url = 'http://'+args.host+'/messagelist/list/outgoing/all?username='+username+'&password='+password
+   url = protocol+'://'+args.host+'/messagelist/list/outgoing/all?username='+username+'&password='+password
    result = smushBox(url)
    if result['success']:
       print "#\tMessage ID\tPhone Number\tDate\t\t\tMessage"
@@ -60,7 +60,7 @@ def listOutgoing():
    sys.exit()
 
 def listContacts():
-   url = 'http://'+args.host+'/phonebook/list?username='+username+'&password='+password
+   url = protocol+'://'+args.host+'/phonebook/list?username='+username+'&password='+password
    result = smushBox(url)
    if result['success']:
       print "#\tPhone Number\tDisabled\tGroup"
@@ -71,10 +71,10 @@ def listContacts():
    sys.exit()
 
 def checkUpdate():
-   statusUrl = 'http://'+args.host+'/system/systemstats?username='+username+'&password='+password
+   statusUrl = protocol+'://'+args.host+'/system/systemstats?username='+username+'&password='+password
    status = smushBox(statusUrl)
    if status['success']:
-      url = 'http://'+args.host+'/system/checkforfirmwareupdate?username='+username+'&password='+password
+      url = protocol+'://'+args.host+'/system/checkforfirmwareupdate?username='+username+'&password='+password
       result = smushBox(url)
       if result['success']:
          print "System version:   ",status['message']['version']
@@ -91,7 +91,7 @@ def checkUpdate():
    sys.exit()
 	
 def checkStatus():
-   url = 'http://'+args.host+'/system/systemstats?username='+username+'&password='+password
+   url = protocol+'://'+args.host+'/system/systemstats?username='+username+'&password='+password
    result = smushBox(url)
    if result['success']:
       print "Uptime:        %s" % niceTime(int(result['message']['uptime']))
@@ -106,7 +106,7 @@ def checkStatus():
    sys.exit()   
 
 def performUpgrade():
-   statusUrl = 'http://'+args.host+'/system/updatetolatestfirmware?username='+username+'&password='+password
+   statusUrl = protocol+'://'+args.host+'/system/updatetolatestfirmware?username='+username+'&password='+password
    print "About to upgrade SmushBox, this process may take a few minutes, do not interrupt."
    status = smushBox(statusUrl)
    print status
@@ -143,6 +143,7 @@ group.add_argument('-o','--outgoing',help='Display all outgoing messages',action
 group.add_argument('-c','--contacts',help='Display phonebook',action='store_true')
 group.add_argument('-cu','--checkupdate',help='Check for available update',action='store_true')
 group.add_argument('-pu','--performupgrade',help='Upgrade your SmushBox, performs --checkupdate first',action='store_true')
+group.add_argument('-ssl','--ssl',help='Use SSL to connect to SmushBox',action='store_true')
 group.add_argument('-s','--status',help='Retrieve SmushBox status',action='store_true')
 group.add_argument('-do','--deleteout',help='Deletes message DELETEOUT (# or all) -- Not implemented yet',required=False)
 group.add_argument('-v', '--version', action='version', version='%(prog)s 1.2')
@@ -164,6 +165,11 @@ if args.username:
 
 if args.password:
    password = args.password
+   
+if args.ssl:
+	protocol = 'https'
+else:
+	protocol = 'http'
 
 # Send a Text (SMS) Message
 if args.text:
@@ -195,7 +201,7 @@ elif args.status:
    checkStatus()   
 # Delete outgoing messages   
 elif args.deleteout:
-   url = 'http://'+args.host+'/messagelist/delete/outgoing/all?username='+username+'&password='+password
+   url = protocol + '://'+args.host+'/messagelist/delete/outgoing/all?username='+username+'&password='+password
    smushBox(url)
    sys.exit()
 else:
