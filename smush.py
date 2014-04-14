@@ -133,8 +133,14 @@ def niceTime( totalSec ):
 # Add valid arguments to application
 parser = argparse.ArgumentParser(description='Manage a SmushBox by RobPickering.com.',epilog='Example: smush.py 172.31.20.5 -t -n 6145551212 -m "Testing 123"')
 parser.add_argument('host',help='SmushBox IP or FQDN')
+parser.add_argument('--ssl',help='Use SSL to connect to SmushBox',action='store_true')
+
+# Setup arg groups
 group = parser.add_mutually_exclusive_group()
 text_group = group.add_argument_group()
+authgroup = parser.add_argument_group('authentication')
+
+# Add members to arg groups
 text_group.add_argument('-t','--text',help='Send SMS message',action='store_true')
 text_group.add_argument('-n','--number',help='Recipient mobile number',required=False)
 text_group.add_argument('-m','--message',help='Text message to send, use quoted string',required=False)
@@ -143,11 +149,9 @@ group.add_argument('-o','--outgoing',help='Display all outgoing messages',action
 group.add_argument('-c','--contacts',help='Display phonebook',action='store_true')
 group.add_argument('-cu','--checkupdate',help='Check for available update',action='store_true')
 group.add_argument('-pu','--performupgrade',help='Upgrade your SmushBox, performs --checkupdate first',action='store_true')
-group.add_argument('-ssl','--ssl',help='Use SSL to connect to SmushBox',action='store_true')
 group.add_argument('-s','--status',help='Retrieve SmushBox status',action='store_true')
 group.add_argument('-do','--deleteout',help='Deletes message DELETEOUT (# or all) -- Not implemented yet',required=False)
 group.add_argument('-v', '--version', action='version', version='%(prog)s 1.2')
-authgroup = parser.add_argument_group('authentication')
 authgroup.add_argument('-u','--username',help='SmushBox username, defaults to "smushbox"',required=False)
 authgroup.add_argument('-p','--password',help='SmushBox password, defaults to "smushbox"',required=False)
 
